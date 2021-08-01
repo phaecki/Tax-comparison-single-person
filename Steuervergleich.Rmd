@@ -1,0 +1,108 @@
+---
+title: "Steuervergleich"
+subtitle: "Kantonaler Vergleich der Einkommens- und Vermögenssteuern für eine alleinstehende Person"
+author: ""
+date: ""
+lang: "de"
+output: 
+  html_document:
+    toc: FALSE
+    toc_float: FALSE
+    toc_depth: 2
+    code_folding: hide
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r setup, include=FALSE}
+# Pakete laden
+library(tidyverse)
+library(readr)
+library(kableExtra)
+library(prettydoc)
+library(knitr)
+```
+
+```{r, include=FALSE}
+# CSV-Datei in Variable laden
+steuern <- read_delim("https://www.daten-analyse.ch/r-data/steuervergleich/steuervergleich.csv", ";", escape_double = FALSE, trim_ws = TRUE)
+```
+
+Um den Steuervergleich zu berechnen, wurden folgende Paramteter verwendet:
+
+* Steuerjahr: 2019
+* Wohnort: Jeweiliger Kantonshauptort
+* Alter: 40 Jahre
+* Keine Kinder
+* Konfession: Römisch-katholisch
+* Bruttoeinkommen: CHF 78'000 (Durchschnittseinkommen in der Schweiz gemäss www.lohncheck.ch)
+* Reinvermögen: CHF 185'000 (Durchschnittsvermögen)
+
+## Durchschnitt
+
+```{r}
+mean_steuern <- mean(steuern$Total.Steuern)
+```
+
+Die durchschnittlichen Einkommens- und Vermögenssteuern aller 26 Kantone für eine alleinstehende Person betragen **CHF `r prettyNum(round(mean(steuern$Total.Steuern)), big.mark="'")`**.
+
+## Median
+
+Der Median der Einkommens- und Vermögenssteuer aller 26 Kantone liegt für eine alleinstehende Person bei **CHF `r prettyNum(round(median(steuern$Total.Steuern)), big.mark="'")`**.
+
+## Vergleich
+
+### Alphabetisch sortiert nach Kanton
+
+```{r}
+# Steuerbetrag als Tabelle ausgeben
+steuerbetrag <- steuern %>% 
+  select(Kanton, Total.Steuern) %>% 
+  mutate(Total.Steuern = format(Total.Steuern, big.mark = "'")) %>% 
+  rename('Steuerbetrag in CHF' = Total.Steuern)
+
+kbl(steuerbetrag) %>% 
+  kable_styling(full_width = FALSE, position = "left") %>%
+  column_spec(1, width = "18em") %>%
+  column_spec(2, width = "12em")
+```
+
+### Sortiert nach Steuerbelastung
+
+```{r}
+# Steuerbetrag als Tabelle ausgeben
+steuerbetrag <- steuerbetrag %>% 
+  arrange(`Steuerbetrag in CHF`)
+
+kbl(steuerbetrag) %>% 
+  kable_styling(full_width = FALSE, position = "left") %>%
+  column_spec(1, width = "18em") %>%
+  column_spec(2, width = "12em")
+```
+
+```{r, echo=TRUE}
+# Steuerbetrag als Plot ausgeben
+steuern %>% 
+  ggplot(aes(reorder(Kantonskuerzel, Total.Steuern), Total.Steuern)) +
+  geom_point() +
+  labs(x = "Kantone",
+       y = "Steuerbetrag in CHF") +
+  theme_linedraw() +
+  ylim(0, 16000) +
+  geom_hline(yintercept = mean_steuern, size = 0.5, linetype = "dashed", 
+             colour = "red") +
+  annotate("text", x = 5.2, y = 11700, size = 4, hjust = 0, 
+           label = "Schweizer\nDurchschnitt")
+```
+
+## R Markdown
+
+Dieser Steuervergleich wurde mit R Markdown erstellt und anschliessend als HTML-Datei ausgegeben. R Markdown ist eine einfache Formatierungssyntax, die sowohl formatierten Inhalt als auch die Ausgabe aller eingebetteten R-Code-Blöcke enthält.
+
+## Quellen
+
+* [ESTV-Steuerrechner](https://swisstaxcalculator.estv.admin.ch/#/calculator/income-wealth-tax){target="_blank"}
+* [Lohncheck GmbH](https://www.lohncheck.ch/de/articles/durchschnittslohn){target="_blank"}
+* [Tages-Anzeiger](https://www.tagesanzeiger.ch/schweiz/standard/eine-halbe-kiste/story/23547594){target="_blank"}
