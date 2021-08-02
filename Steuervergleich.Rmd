@@ -40,7 +40,7 @@ Um den Steuervergleich zu berechnen, wurden folgende Paramteter verwendet:
 * Bruttoeinkommen: CHF 78'000 (Durchschnittseinkommen in der Schweiz gemäss www.lohncheck.ch)
 * Reinvermögen: CHF 185'000 (Durchschnittsvermögen)
 
-## Durchschnitt
+## Mittelwert
 
 ```{r}
 mean_steuern <- mean(steuern$Total.Steuern)
