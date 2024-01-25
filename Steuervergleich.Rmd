@@ -1,8 +1,8 @@
 ---
-title: "Steuervergleich"
+title: "Steuervergleich 2023"
 subtitle: "Kantonaler Vergleich der Einkommens- und Vermögenssteuern für eine alleinstehende Person"
-author: "phaecki"
-date: ""
+author: "DataVisual"
+date: "`r Sys.Date()`"
 lang: "de"
 output: 
   html_document:
@@ -27,20 +27,21 @@ library(knitr)
 
 ```{r, include=FALSE}
 # CSV-Datei in Variable laden
-steuern <- read_delim("https://www.daten-analyse.ch/r-data/steuervergleich/steuervergleich.csv", ";", escape_double = FALSE, trim_ws = TRUE)
+steuern <- read_delim("https://www.datavisual.ch/r-data/steuervergleich/steuervergleich_2023.csv", ";", escape_double = FALSE, trim_ws = TRUE, show_col_types = FALSE)
 ```
 
 Um den Steuervergleich zu berechnen, wurden folgende Paramteter verwendet:
 
-* Steuerjahr: 2019
+* Steuerjahr: 2023
 * Wohnort: Jeweiliger Kantonshauptort
+* Zivilstand: Alleinstehend
 * Alter: 40 Jahre
-* Keine Kinder
+* Ohne Kinder
 * Konfession: Römisch-katholisch
-* Bruttoeinkommen: CHF 78'000 (Durchschnittseinkommen in der Schweiz gemäss www.lohncheck.ch)
-* Reinvermögen: CHF 185'000 (Durchschnittsvermögen)
+* Bruttoeinkommen pro Jahr: CHF 79'980 (Medianlohn 2020 in der Schweiz gemäss Bundesamt für Statistik)
+* Reinvermögen: CHF 186'287 (Medianvermögen 2023 in der Schweiz gemäss Schwiizerfranke)
 
-## Mittelwert
+## Durchschnitt
 
 ```{r}
 mean_steuern <- mean(steuern$Total.Steuern)
@@ -91,10 +92,10 @@ steuern %>%
        y = "Steuerbetrag in CHF") +
   theme_linedraw() +
   ylim(0, 16000) +
-  geom_hline(yintercept = mean_steuern, size = 0.5, linetype = "dashed", 
+  geom_hline(yintercept = mean_steuern, linewidth = 0.5, linetype = "dashed", 
              colour = "red") +
-  annotate("text", x = 5.2, y = 11700, size = 4, hjust = 0, 
-           label = "Schweizer\nDurchschnitt")
+  annotate("text", x = 5.2, y = mean_steuern, size = 4, hjust = 0, 
+           label = "Schweizer\nMittelwert")
 ```
 
 ## R Markdown
@@ -104,5 +105,5 @@ Dieser Steuervergleich wurde mit R Markdown erstellt und anschliessend als HTML-
 ## Quellen
 
 * [ESTV-Steuerrechner](https://swisstaxcalculator.estv.admin.ch/#/calculator/income-wealth-tax){target="_blank"}
-* [Lohncheck GmbH](https://www.lohncheck.ch/de/articles/durchschnittslohn){target="_blank"}
-* [Tages-Anzeiger](https://www.tagesanzeiger.ch/schweiz/standard/eine-halbe-kiste/story/23547594){target="_blank"}
+* [Bundesamt für Statistik](https://www.bfs.admin.ch/asset/de/21224887){target="_blank"}
+* [Schwiizerfranke](https://www.schwiizerfranke.com/durchschnittsvermoegen-schweiz){target="_blank"}
